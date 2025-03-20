@@ -6,7 +6,7 @@
 **State-of-the-Art Reasoning Chatbot System**
 
 ### Description:
-This project explores and implements advanced reasoning techniques using GPT-4 Mini and LangChain to generate results based on multiple reasoning engines. It integrates these methods into a chatbot architecture, enabling users to interact with a system that performs complex reasoning tasks. The system is designed with a seamless interaction between the frontend (Streamlit) and backend (Django & DRF).
+This project explores and implements advanced reasoning techniques using GPT-4o Mini and LangChain to generate results based on multiple reasoning engines. It integrates these methods into a chatbot architecture, enabling users to interact with a system that performs complex reasoning tasks. The system is designed with a seamless interaction between the frontend (Streamlit) and backend (Django & DRF).
 
 ### Architecture Overview:
 The system consists of two main components:
@@ -20,7 +20,6 @@ The reasoning engines used are:
 
 These reasoning engines are integrated into the system via LangChain, which facilitates the chaining of different reasoning components.
 
-
 ### Tech Stack:
 - **Backend**: Django, Django REST Framework (DRF)
 - **Frontend**: Streamlit
@@ -31,6 +30,46 @@ These reasoning engines are integrated into the system via LangChain, which faci
 - **Reasoning-based Chatbot**: Uses advanced LLMs to reason through tasks and generate informed responses.
 - **Interactive UI**: Streamlit provides a simple, real-time interface for users to interact with the model.
 - **State Management**: Chat history is stored and used to improve responses based on previous messages.
+
+## Modules for Evaluation
+
+The following modules are responsible for implementing the reasoning process in both the backend and frontend.
+
+### Backend Modules (`Back-end/reasoning/`)
+
+#### 1. `engines.py`
+- Contains the implementations of different reasoning engines:
+  - **CoT (Chain-of-Thought)**
+  - **TOT (Tree-of-Thought)**
+  - **CoT-sc (Chain-of-Thought with Self-Consistency)**
+- Defines logic for invoking the selected reasoning technique.
+- Integrates with **LangChain** to process inputs and generate structured reasoning responses.
+
+#### 2. `views.py`
+- Defines API views for handling requests related to reasoning-based responses.
+- Implements:
+  - **`HistoryView`**: Retrieves chat history.
+  - **`CoTView`**: Processes input messages using Chain-of-Thought and streams responses.
+- Manages interactions between the frontend and reasoning engines.
+
+#### 3. `urls.py`
+- Maps API endpoints to corresponding views.
+- Defines routes for reasoning-related operations:
+  - `/history/` → Chat history retrieval.
+  - `/cot/` → Chain-of-Thought processing.
+
+
+### Frontend Modules (`Front-end/`)
+
+#### 1. `app.py`
+- Implements the **Streamlit** interface for user interaction.
+- Sends user input to the backend via API calls.
+- Streams responses from the backend for real-time updates.
+
+#### 2. `utils.py`
+- Contains helper functions for frontend operations:
+  - **Formatting responses** for better display.
+
 
 ## Installation and Setup
 
