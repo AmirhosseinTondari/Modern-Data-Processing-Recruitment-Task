@@ -96,7 +96,7 @@ The following modules are responsible for implementing the reasoning process in 
 - **Description**: Retrieves the entire chat history as a dictionary.
 
 ### Chain-of-Thought (CoT) View
-- **Endpoint**: `/chat/cot/`
+- **Endpoint**: `/chat/cot/?message=<your prompt>`
 - **Method**: `GET`
 - **Parameters**:
   - `message`: The user's message to process (passed as a query parameter).
