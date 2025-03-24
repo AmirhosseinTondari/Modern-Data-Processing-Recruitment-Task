@@ -1,21 +1,21 @@
 import requests
+import json
 
-def stream_response(url):
+def stream_cot(url):
     with requests.get(url, stream=True) as response:
-        for chunk in response.iter_content():
+        for chunk in response.iter_content(decode_unicode=True):
             if chunk:
                 try:
-                    yield chunk.decode("utf-8")
+                    yield chunk
                 except:
                     print(chunk)
 
-def styling_wrapper(response_generator):
-    response = ""
-    for token in response_generator:
-        response += token
-        if response[-16:] == "Final Response: ":
-            break
-        yield f'<p class="thoughts">{token}</p>'
-    
-    for token in response_generator:
-        yield token
+def stream_cotsc(url):
+    with requests.get(url, stream=True) as response:
+        buffer = ""
+        for chunk in response.iter_content(decode_unicode=True):
+            if chunk:
+                buffer += chunk
+                if buffer[-1] == "\n":
+                    data, buffer = buffer.split('\n', 1)
+                    yield json.loads(data)

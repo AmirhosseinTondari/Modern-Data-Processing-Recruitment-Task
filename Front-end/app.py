@@ -40,9 +40,7 @@ for message in st.session_state.HISTORY:
 
 
 sidebar = st.sidebar
-# st.session_state.MEMORY = sidebar.checkbox("Memory", True)
-# sidebar.markdown("___")
-st.session_state.METHOD = sidebar.radio("Reasoning Method:", ["CoT", "CoT-sc", "ToT"])
+st.session_state.METHOD = sidebar.radio("Reasoning Method:", ["CoT", "CoTSC", "ToT"])
 
 chat_input = st.chat_input("پیام خود را اینجا تایپ کنید ...")
 
@@ -50,18 +48,46 @@ chat_input = st.chat_input("پیام خود را اینجا تایپ کنید ..
 if chat_input not in (None, "", " "):
     with st.chat_message("user"):
         st.markdown(chat_input)
-
-    response_gen = utils.stream_response(f"http://127.0.0.1:8000/chat/{st.session_state.METHOD.lower()}/?message={chat_input}")
+        
     with st.chat_message('ai'):
-        response_container = st.empty()
-        thoughts = ""
-        final_response = ""
-        for token in response_gen:
-            if thoughts[-16:] != "Final Response: ":
-                thoughts += token
-            else:
-                final_response += token
+        match st.session_state.METHOD:
+            case "CoT":
+                response_gen = utils.stream_cot(f"http://127.0.0.1:8000/chat/cot/?message={chat_input}")
+                response_container = st.empty()
+
+                thoughts = ""
+                final_response = ""
+                for chunk in response_gen:
+                    if thoughts[-16:] != "Final Response: ":
+                        thoughts += chunk
+                    else:
+                        final_response += chunk
+                    
+                    formatted_thoughts = "".join(f'<p class="thoughts">{para}</p>' for para in thoughts.split("\n\n"))
+                    formatted_final_response = f'<p>{final_response}</p>'
+                    response_container.markdown(f'{formatted_thoughts} {formatted_final_response}', unsafe_allow_html=True)
             
-            formatted_thoughts = "".join(f'<p class="thoughts">{para}</p>' for para in thoughts.split("\n\n"))
-            formatted_final_response = f'<p>{final_response}</p>'
-            response_container.markdown(f'{formatted_thoughts} {formatted_final_response}', unsafe_allow_html=True)
+            case "CoTSC":
+                response_gen = utils.stream_cotsc(f"http://127.0.0.1:8000/chat/cotsc/?message={chat_input}")
+                cot_container = st.container()
+                final_container = st.container()
+                cot0_c, cot1_c, cot2_c = cot_container.columns(3)
+                cot0_e = cot0_c.empty()
+                cot1_e = cot1_c.empty()
+                cot2_e = cot2_c.empty()
+                final_e = final_container.empty()
+
+                response_dict = {f"cot{i}":"" for i in range(3)} | {"final":""}
+                for chunk in response_gen:
+                    for k in chunk:
+                        response_dict[k] += chunk[k]
+                
+                    formatted_response = {k:"".join(f'<p class="thoughts">{para}</p>' for para in v.split("\n\n")) if k!="final" else f'<p>{v}</p>' for k,v in response_dict.items()}
+                    
+                    cot0_e.markdown(formatted_response['cot0'], unsafe_allow_html=True)
+                    cot1_e.markdown(formatted_response['cot1'], unsafe_allow_html=True)
+                    cot2_e.markdown(formatted_response['cot2'], unsafe_allow_html=True)
+                    final_e.markdown(formatted_response['final'], unsafe_allow_html=True)
+
+            case "ToT":
+                raise NotImplementedError
