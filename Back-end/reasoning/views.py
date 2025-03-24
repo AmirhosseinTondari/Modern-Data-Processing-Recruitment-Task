@@ -7,6 +7,7 @@ import json
 
 from . import engines
 
+# Initializing engines
 cot_engine = engines.CoT()
 cotsc_engine = engines.CoTSC()
 
@@ -27,8 +28,7 @@ class CoTView(APIView):
     def get(self, request:HttpRequest) -> dict:
         """
         request with a query parameter message.
-        Adds the user's message to the chat history.
-        Passes the chat history to the CoT engine.
+        Passes the message to the CoT engine.
         Returns a StreamingHttpResponse that streams the generated response to the endpoint.
         """
         message = request.GET.get("message")
@@ -39,8 +39,7 @@ class CoTSCView(APIView):
     def get(self, request:HttpRequest) -> dict:
         """
         request with a query parameter message.
-        Adds the user's message to the chat history.
-        Passes the chat history to the CoTSC engine.
+        Passes the message to the CoTSC engine.
         Returns a StreamingHttpResponse that streams the generated response to the endpoint.
         """
         message = request.GET.get("message")
