@@ -23,7 +23,7 @@ class CoT:
     """
 
     def __init__(self):
-        self.history = chat_history
+        self.history = chat_history  # Stores conversation history
 
         # System message guiding the model's reasoning process
         self.system_message = """Let's think step by step.
@@ -34,34 +34,30 @@ class CoT:
         # Define a chat prompt template with a system message and a placeholder for conversation history
         self.prompt_template = ChatPromptTemplate.from_messages(
             [
-                ("system", self.system_message),  # System message providing instructions
-                MessagesPlaceholder(
-                    "history"
-                ),  # Placeholder for dynamic conversation history
+                ("system", self.system_message),  # Instructional system message
+                MessagesPlaceholder("history"),  # Placeholder for conversation history
             ]
         )
 
         # Create a processing chain by combining the prompt template with the language model
-        self.chain = self.prompt_template | llm
+        self.chain = self.prompt_template | llm  # Pipeline: prompt → model
 
     def stream(self, message: str):
         """
-        Collects and streams the content from a generator (CoT engine's response stream).
-        Once the final response is received,
-        it splits the content to extract and store the AI's final response in the chat_history.
-        and omits the thoughts part of response
+        Streams the model's response in chunks.
+        Extracts and stores only the final response in chat history.
         """
 
-        self.history.add_user_message(message)
+        self.history.add_user_message(message)  # Add user input to history
 
-        response=""
+        response = ""
         for chunk in self.chain.stream({"history": self.history.messages}):
             chunk = chunk.content
             response += chunk
-            yield chunk
+            yield chunk  # Stream response in real-time
         
-        _, final = response.split("Final Response: ")
-        self.history.add_ai_message(final)
+        _, final = response.split("Final Response: ")  # Extract final response
+        self.history.add_ai_message(final)  # Store final response in history
 
 
 
@@ -75,35 +71,45 @@ class CoTSC(CoT):
     """
 
     def __init__(self):
-        super().__init__()
+        super().__init__()  # Inherit CoT behavior so we can use CoT's chain
 
+        # System message to aggregate multiple reasoning paths and determine the most consistent answer
         self.system_message = """
-        Answer1:{cot0}
-        Answer2:{cot1}
-        Answer3:{cot2}
+        Answer1: {cot0}
+        Answer2: {cot1}
+        Answer3: {cot2}
         Compare the conclusions from different reasoning paths and determine the most frequent or consistent final answer. 
         Just report the most robust solution with confidence.
         Final Answer: """
 
-        self.prompt_template = PromptTemplate.from_template(self.system_message)
+        self.prompt_template = PromptTemplate.from_template(self.system_message)  # Template for final answer selection
 
+        # Run multiple CoT chains(Inherited from CoT class) in parallel to generate diverse reasoning outputs
         self.subchain = RunnableParallel({f"cot{i}": self.chain for i in range(3)})
 
+        # Combine the aggregated responses with the final decision model
         self.chain = self.prompt_template | {"final": llm}
 
     def stream(self, message: str):
-        cots = {f"cot{i}": "" for i in range(3)}
-        self.history.add_user_message(message)
+        """
+        Streams multiple CoT responses, selects the most consistent answer, and stores it in history.
+        """
+
+        cots = {f"cot{i}": "" for i in range(3)}  # Initialize response storage
+        self.history.add_user_message(message)  # Add user input to history
+
+        # Stream responses from multiple reasoning paths
         for chunk in self.subchain.stream({"history": self.history.messages}):
             chunk = {k: v.content for k, v in chunk.items()}
             for k in chunk:
-                cots[k] = cots[k] + chunk[k]
-            yield json.dumps(chunk) + "\n"
+                cots[k] += chunk[k]  # Accumulate responses per path
+            yield json.dumps(chunk) + "\n"  # Stream responses in JSON format
 
         final = ""
+        # Stream final consistent answer
         for chunk in self.chain.stream(cots):
             chunk["final"] = chunk["final"].content
             final += chunk["final"]
-            yield json.dumps(chunk) + "\n"
+            yield json.dumps(chunk) + "\n"  # Stream final answer in JSON format
 
-        self.history.add_ai_message(final)
+        self.history.add_ai_message(final)  # Store final answer in history

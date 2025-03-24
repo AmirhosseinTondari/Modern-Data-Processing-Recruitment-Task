@@ -47,11 +47,4 @@ class CoTSCView(APIView):
         
         return StreamingHttpResponse(cotsc_engine.stream(message),  content_type="text/plain", status=status.HTTP_200_OK)
     
-class test(APIView):
-    def t(self):
-        for i in range(5):
-            sleep(1)    
-            yield json.dumps({"a":1}) + "\n"
-    def get(self, r):
-        return StreamingHttpResponse(self.t(), content_type="text/plain")
         

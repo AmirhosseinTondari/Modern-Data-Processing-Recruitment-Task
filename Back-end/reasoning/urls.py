@@ -5,5 +5,4 @@ urlpatterns = [
     path('cot/', views.CoTView.as_view()),
     path('cotsc/', views.CoTSCView.as_view()),
     path('history/', views.HistoryView.as_view()),
-    path('test/', views.test.as_view())
 ]
