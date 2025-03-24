@@ -50,6 +50,7 @@ The following modules are responsible for implementing the reasoning process in 
 - Implements:
   - **`HistoryView`**: Retrieves chat history.
   - **`CoTView`**: Processes input messages using Chain-of-Thought and streams responses.
+  - **`CoTSCView`**: Processes input messages using Chain-of-Thought with Self-Consistency and streams responses.
 - Manages interactions between the frontend and reasoning engines.
 
 #### 3. `urls.py`
@@ -57,6 +58,7 @@ The following modules are responsible for implementing the reasoning process in 
 - Defines routes for reasoning-related operations:
   - `/history/` → Chat history retrieval.
   - `/cot/` → Chain-of-Thought processing.
+  - `/cotsc/` → Chain-of-Thought with Self-Consistency processing.
 
 
 ### Frontend Modules (`Front-end/`)
@@ -77,7 +79,7 @@ The following modules are responsible for implementing the reasoning process in 
 
 #### Prerequisites:
 - **Python**: Ensure you are using **Python 3.11**.
-- **Libs**: Refer to the requirements.txt in each stack
+- **Libs**: Refer to the requirements.txt in each stack folder.
 
 #### Installation Steps:
 - **Front-end**: pip install -r ./Front-end/requirements.txt
@@ -102,6 +104,13 @@ The following modules are responsible for implementing the reasoning process in 
   - `message`: The user's message to process (passed as a query parameter).
 - **Description**: Streams the response from the CoT engine as a generator function and adds both the user's message and AI's final response to the chat history.
 
+### Chain-of-Thought with Self-Consistency (CoTSC) View
+- **Endpoint**: `/chat/cotsc/?message=<your prompt>`
+- **Method**: `GET`
+- **Parameters**:
+  - `message`: The user's message to process (passed as a query parameter).
+- **Description**: Streams the response from the CoTSC engine as a generator function and adds both the user's message and AI's final response to the chat history.
+
 ## LLM Integration
 
 ### LLM Provider: 
@@ -120,7 +129,7 @@ The request flow follows this sequence:
 ### Streaming Response:
 For real-time interactions, particularly for long or multi-step responses (e.g. Tree of Thoughts), the system supports **streaming responses**. This is achieved using:
 **Streaming API**: Implemented via Django's `StreamingHttpResponse` to send incremental data as the LLM processes and returns the response.
-
+Client-Side Handling: The frontend dynamically updates as new response chunks arrive.
 This enables a smooth user experience, especially for longer or complex reasoning tasks.
 
 ## Database:
