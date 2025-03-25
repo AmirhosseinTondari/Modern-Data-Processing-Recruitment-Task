@@ -144,5 +144,4 @@ Ideally `structlog` and `loguru` **Not Implemented**
 - **SQL Database**
 - **In memory storage for Chat History**
 - **Logger**
-- **CoT-SC**
 - **ToT**
