@@ -11,19 +11,19 @@ This project explores and implements advanced reasoning techniques using GPT-4o 
 ### Architecture Overview:
 The system consists of two main components:
 - **Frontend (Streamlit)**: A user-friendly interface where users can interact with the chatbot. Streamlit is used to build the interactive interface that sends messages to the backend and streams responses from the model.
-- **Backend (Django & DRF)**: Handles the logic for processing messages, interacting with the LangChain-based reasoning engines, and generating responses using GPT-4 Mini. The backend also stores chat history and manages the state of conversations.
+- **Backend (Django & DRF)**: Handles the logic for processing messages, interacting with the LangChain-based reasoning engines, and generating responses using GPT-4o Mini. The backend also stores chat history and manages the state of conversations.
 
 The reasoning engines used are:
 - **CoT (Chain-of-Thought)**: A reasoning technique that breaks down tasks into smaller steps, allowing for structured reasoning and more detailed responses.
 - **TOT (Tree-of-Thought)**: A variant of the Chain-of-Thought approach that uses tree-like structures to organize reasoning steps and improve complex decision-making. **Not Implemented**
-- **CoT-SC (Chain-of-Thought with Self-Consistency)**: An extension of the Chain-of-Thought approach that checks for consistency in the reasoning process. It generates multiple reasoning paths and selects the most consistent one to improve the reliability of the final answer. **Not Implemented**
+- **CoT-SC (Chain-of-Thought with Self-Consistency)**: An extension of the Chain-of-Thought approach that checks for consistency in the reasoning process. It generates multiple reasoning paths and selects the most consistent one to improve the reliability of the final answer.
 
 These reasoning engines are integrated into the system via LangChain, which facilitates the chaining of different reasoning components.
 
 ### Tech Stack:
 - **Backend**: Django, Django REST Framework (DRF)
 - **Frontend**: Streamlit
-- **LLM Integration**: GPT-4 Mini (used for the language model and reasoning tasks)
+- **LLM Integration**: GPT-4o Mini (used for the language model and reasoning tasks)
 - **Reasoning Framework**: LangChain (used for chaining and processing the reasoning steps)
   
 ### Key Features:
