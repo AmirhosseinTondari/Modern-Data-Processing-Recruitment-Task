@@ -20,6 +20,7 @@ p, input, textarea, label, ul, li, ol, h1, h2, h3, h4, h5, h6 {
             color: gray; 
             font-style: italic;
             opacity: 0.7;
+            font-family: 'Rubik', sans-serif;
         }
 </style>
 """,
